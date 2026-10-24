@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: poolrush
+      POSTGRES_PASSWORD: poolrush-dev
+      POSTGRES_DB: poolrush
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://poolrush:poolrush-dev@postgres:5432/poolrush
+      REDIS_URL: redis://redis:6379
+      PORT: "4000"
+      ADMIN_KEY: dev-admin-key
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - redis
+volumes:
+  pgdata:
