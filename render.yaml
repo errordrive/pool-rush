@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: pool-rush
+    runtime: node
+    plan: free
+    buildCommand: npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend
+    startCommand: node backend/src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: ADMIN_KEY
+        sync: false
